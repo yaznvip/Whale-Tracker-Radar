@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AYB Live Whale Radar</title>
+    <title>AYB Live Whale Radar Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -19,21 +19,13 @@
     <div class="max-w-5xl mx-auto">
         <header class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-800 pb-6 gap-4">
             <div>
-                <h1 class="text-3xl font-bold text-green-500">AYO RADAR <span class="text-xs bg-green-900/30 px-2 py-1 rounded">V2.0 LIVE</span></h1>
-                <p class="text-slate-400 text-sm mt-1">Real-time Blockchain Activity Monitor</p>
+                <h1 class="text-3xl font-bold text-green-500">AYO RADAR <span class="text-xs bg-green-900/30 px-2 py-1 rounded">V2.1 PRO</span></h1>
+                <div id="totalValue" class="text-white font-mono text-lg mt-1">Total Assets: <span class="text-green-400">$0.00</span></div>
             </div>
             
             <div class="flex flex-wrap items-center justify-center gap-3">
-                <a href="https://www.linkedin.com/in/ayoup-alhaj-ali-4385b02ba" target="_blank" class="bg-[#0077b5] hover:bg-[#005c8c] text-white text-[10px] md:text-xs font-bold py-2 px-4 rounded-lg transition-all flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                    LINKEDIN
-                </a>
-
-                <a href="https://t.me/Ayoupalhaj" target="_blank" class="bg-[#0088cc] hover:bg-[#006699] text-white text-[10px] md:text-xs font-bold py-2 px-4 rounded-lg transition-all flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.11.02-1.93 1.23-5.46 3.62-.51.35-.98.52-1.4.51-.46-.01-1.35-.26-2.01-.48-.81-.27-1.45-.42-1.39-.89.03-.24.36-.49.99-.75 3.88-1.69 6.46-2.8 7.74-3.35 3.68-1.56 4.44-1.83 4.94-1.84.11 0 .35.03.5.16.13.1.17.24.18.33.01.07.02.21.01.32z"/></svg>
-                    TELEGRAM
-                </a>
-
+                <a href="https://www.linkedin.com/in/ayoup-alhaj-ali-4385b02ba" target="_blank" class="bg-[#0077b5] hover:bg-[#005c8c] text-white text-[10px] md:text-xs font-bold py-2 px-4 rounded-lg transition-all flex items-center gap-2">LINKEDIN</a>
+                <a href="https://t.me/Ayoupalhaj" target="_blank" class="bg-[#0088cc] hover:bg-[#006699] text-white text-[10px] md:text-xs font-bold py-2 px-4 rounded-lg transition-all flex items-center gap-2">TELEGRAM</a>
                 <div id="connectionStatus" class="flex items-center gap-2 text-[10px] font-mono text-slate-500 border-l border-slate-700 pl-3">
                     <span class="w-2 h-2 bg-slate-600 rounded-full"></span> OFFLINE
                 </div>
@@ -44,19 +36,19 @@
             <div class="flex flex-col md:flex-row gap-4">
                 <input type="text" id="walletAddr" placeholder="Enter Wallet Address..." 
                     class="flex-1 bg-slate-950 border border-slate-700 p-4 rounded-xl focus:outline-none focus:border-green-500 font-mono text-sm">
-                <button onclick="startMonitoring()" id="btnAction" class="bg-green-600 hover:bg-green-500 px-8 py-4 md:py-0 rounded-xl font-bold transition-all">
-                    START MONITORING
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="startMonitoring()" id="btnStart" class="bg-green-600 hover:bg-green-500 px-6 py-4 rounded-xl font-bold transition-all flex-1 text-xs">START</button>
+                    <button onclick="stopMonitoring()" id="btnStop" class="bg-red-600 hover:bg-red-500 px-6 py-4 rounded-xl font-bold transition-all hidden text-xs">STOP</button>
+                </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" id="assetsGrid">
-        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="assetsGrid"></div>
 
         <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
             <div class="p-4 bg-slate-800/50 border-b border-slate-800 font-bold text-slate-300">Live Movement Log</div>
-            <div id="logContainer" class="max-h-[400px] overflow-y-auto p-4 space-y-3 font-mono text-xs">
-                <div class="text-slate-600 italic">Waiting for target initialization...</div>
+            <div id="logContainer" class="max-h-[300px] overflow-y-auto p-4 space-y-2 font-mono text-xs text-slate-400">
+                <div class="italic">Ready for target input...</div>
             </div>
         </div>
     </div>
@@ -64,35 +56,52 @@
     <script>
         const RPC_URL = "https://eth.drpc.org";
         const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
-        const ERC20_ABI = ["function balanceOf(address) view returns (uint256)", "function symbol() view returns (string)", "function decimals() view returns (uint8)"];
+        const ERC20_ABI = ["function balanceOf(address) view returns (uint256)", "function decimals() view returns (uint8)"];
         
         const TOKENS = [
-            { symbol: "USDT", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7" },
-            { symbol: "USDC", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eb48" },
-            { symbol: "PEPE", address: "0x6982508145454Ce325dDbE47a25d4ec3d2311933" }
+            { symbol: "USDT", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7", price: 1 },
+            { symbol: "USDC", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eb48", price: 1 },
+            { symbol: "DAI", address: "0x6B175474E89094C44Da98b954EedeAC495271d0F", price: 1 },
+            { symbol: "PEPE", address: "0x6982508145454Ce325dDbE47a25d4ec3d2311933", price: 0.000008 },
+            { symbol: "SHIB", address: "0x95aD61b0a150d79219dcf64E1E6Cc01f0B64C4cE", price: 0.00002 }
         ];
 
         let balanceMemory = {};
+        let monitorInterval = null;
+        let ethPrice = 2500; 
 
         async function startMonitoring() {
             const address = document.getElementById('walletAddr').value.trim();
             if(!ethers.utils.isAddress(address)) return alert("Invalid Address!");
 
-            document.getElementById('connectionStatus').innerHTML = `<span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> LIVE`;
-            document.getElementById('btnAction').disabled = true;
-            document.getElementById('btnAction').className = "bg-slate-700 px-8 rounded-xl font-bold opacity-50";
-            document.getElementById('logContainer').innerHTML = "";
-
-            pushLog("System", `Tracking started for ${address.substring(0,6)}...`);
+            toggleButtons(true);
+            pushLog("System", `Initializing Radar for: ${address.substring(0,10)}...`);
             
             await performScan(address);
-            setInterval(() => performScan(address), 15000);
+            monitorInterval = setInterval(() => performScan(address), 15000);
+        }
+
+        function stopMonitoring() {
+            clearInterval(monitorInterval);
+            toggleButtons(false);
+            pushLog("System", "Monitoring Stopped.", false);
+        }
+
+        function toggleButtons(isRunning) {
+            document.getElementById('btnStart').classList.toggle('hidden', isRunning);
+            document.getElementById('btnStop').classList.toggle('hidden', !isRunning);
+            document.getElementById('walletAddr').disabled = isRunning;
+            document.getElementById('connectionStatus').innerHTML = isRunning ? 
+                `<span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> LIVE` : 
+                `<span class="w-2 h-2 bg-slate-600 rounded-full"></span> OFFLINE`;
         }
 
         async function performScan(address) {
+            let totalUSD = 0;
             try {
                 const ethRaw = await provider.getBalance(address);
                 const ethBal = parseFloat(ethers.utils.formatEther(ethRaw)).toFixed(4);
+                totalUSD += ethBal * ethPrice;
                 handleBalanceUpdate("ETH", ethBal);
 
                 for (const t of TOKENS) {
@@ -101,19 +110,21 @@
                     const dec = await contract.decimals();
                     const bal = (Number(balRaw) / Math.pow(10, Number(dec))).toFixed(2);
                     
-                    if (parseFloat(bal) > 0) handleBalanceUpdate(t.symbol, bal);
+                    if (parseFloat(bal) > 0) {
+                        totalUSD += bal * t.price;
+                        handleBalanceUpdate(t.symbol, bal);
+                    }
                 }
-            } catch (e) { console.error("Update failed"); }
+                document.getElementById('totalValue').innerHTML = `Total Assets: <span class="text-green-400">$${totalUSD.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>`;
+            } catch (e) { console.error("Scan Error"); }
         }
 
         function handleBalanceUpdate(symbol, newBal) {
             const oldBal = balanceMemory[symbol];
-            
             if (oldBal !== undefined && oldBal !== newBal) {
-                pushLog(symbol, `MOVEMENT DETECTED! ${oldBal} -> ${newBal}`, true);
+                pushLog(symbol, `CHANGE: ${oldBal} -> ${newBal}`, true);
                 triggerVisualAlert(symbol);
             }
-
             balanceMemory[symbol] = newBal;
             updateAssetCard(symbol, newBal);
         }
@@ -123,17 +134,17 @@
             if (!card) {
                 card = document.createElement('div');
                 card.id = `card-${symbol}`;
-                card.className = "bg-slate-800 p-5 rounded-xl border border-slate-700 transition-all";
+                card.className = "bg-slate-800 p-4 rounded-xl border border-slate-700 log-entry";
                 document.getElementById('assetsGrid').appendChild(card);
             }
-            card.innerHTML = `<span class="text-slate-500 text-xs block">${symbol} BALANCE</span>
-                             <span class="text-2xl font-bold text-green-400">${bal}</span>`;
+            card.innerHTML = `<span class="text-slate-500 text-[10px] block font-bold">${symbol}</span>
+                             <span class="text-xl font-bold text-green-400">${bal}</span>`;
         }
 
         function pushLog(asset, msg, isAlert = false) {
             const container = document.getElementById('logContainer');
             const entry = document.createElement('div');
-            entry.className = `log-entry p-2 rounded ${isAlert ? 'bg-red-900/20 text-red-400 border border-red-900/50' : 'text-slate-400 border-l-2 border-green-600 pl-3'}`;
+            entry.className = `log-entry p-2 rounded ${isAlert ? 'bg-red-900/20 text-red-400 border border-red-900/40' : 'text-slate-400 border-l-2 border-green-600 pl-3'}`;
             entry.innerHTML = `[${new Date().toLocaleTimeString()}] <b>${asset}:</b> ${msg}`;
             container.prepend(entry);
         }
