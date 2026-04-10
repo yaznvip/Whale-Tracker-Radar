@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AYO Live Whale Radar</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0b0f1a; color: white; }
+        .movement-alert { animation: pulse-red 2s infinite; border: 2px solid #ef4444 !important; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .log-entry { animation: slideIn 0.4s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body class="p-6">
+
+    <div class="max-w-5xl mx-auto">
+        <header class="flex justify-between items-center mb-8 border-b border-slate-800 pb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-green-500">AYO RADAR <span class="text-xs bg-green-900/30 px-2 py-1 rounded">V2.0 LIVE</span></h1>
+                <p class="text-slate-400 text-sm mt-1">Real-time Blockchain Activity Monitor</p>
+            </div>
+            <div id="connectionStatus" class="flex items-center gap-2 text-xs font-mono text-slate-500">
+                <span class="w-2 h-2 bg-slate-600 rounded-full"></span> OFFLINE
+            </div>
+        </header>
+
+        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 mb-8 shadow-2xl">
+            <div class="flex gap-4">
+                <input type="text" id="walletAddr" placeholder="Enter Wallet Address..." 
+                    class="flex-1 bg-slate-950 border border-slate-700 p-4 rounded-xl focus:outline-none focus:border-green-500 font-mono">
+                <button onclick="startMonitoring()" id="btnAction" class="bg-green-600 hover:bg-green-500 px-8 rounded-xl font-bold transition-all">
+                    START MONITORING
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" id="assetsGrid">
+            </div>
+
+        <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
+            <div class="p-4 bg-slate-800/50 border-b border-slate-800 font-bold text-slate-300">Live Movement Log</div>
+            <div id="logContainer" class="max-h-[400px] overflow-y-auto p-4 space-y-3 font-mono text-sm">
+                <div class="text-slate-600 italic">Waiting for target initialization...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const RPC_URL = "https://eth.drpc.org";
+        const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+        const ERC20_ABI = ["function balanceOf(address) view returns (uint256)", "function symbol() view returns (string)", "function decimals() view returns (uint8)"];
+        
+        const TOKENS = [
+            { symbol: "USDT", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7" },
+            { symbol: "USDC", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eb48" },
+            { symbol: "PEPE", address: "0x6982508145454Ce325dDbE47a25d4ec3d2311933" }
+        ];
+
+        let balanceMemory = {};
+
+        async function startMonitoring() {
+            const address = document.getElementById('walletAddr').value.trim();
+            if(!ethers.utils.isAddress(address)) return alert("Invalid Address!");
+
+            document.getElementById('connectionStatus').innerHTML = `<span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> LIVE`;
+            document.getElementById('btnAction').disabled = true;
+            document.getElementById('btnAction').className = "bg-slate-700 px-8 rounded-xl font-bold opacity-50";
+            document.getElementById('logContainer').innerHTML = "";
+
+            pushLog("System", `Tracking started for ${address.substring(0,6)}...`);
+            
+            // Initial Data Fetch
+            await performScan(address);
+            
+            // Real-time Loop (Every 15 Seconds)
+            setInterval(() => performScan(address), 15000);
+        }
+
+        async function performScan(address) {
+            try {
+                // 1. Check ETH
+                const ethRaw = await provider.getBalance(address);
+                const ethBal = parseFloat(ethers.utils.formatEther(ethRaw)).toFixed(4);
+                handleBalanceUpdate("ETH", ethBal);
+
+                // 2. Check Tokens
+                for (const t of TOKENS) {
+                    const contract = new ethers.Contract(t.address, ERC20_ABI, provider);
+                    const balRaw = await contract.balanceOf(address);
+                    const dec = await contract.decimals();
+                    const bal = (Number(balRaw) / Math.pow(10, Number(dec))).toFixed(2);
+                    
+                    if (parseFloat(bal) > 0) handleBalanceUpdate(t.symbol, bal);
+                }
+            } catch (e) { console.error("Update failed"); }
+        }
+
+        function handleBalanceUpdate(symbol, newBal) {
+            const oldBal = balanceMemory[symbol];
+            
+            if (oldBal !== undefined && oldBal !== newBal) {
+                pushLog(symbol, `MOVEMENT DETECTED! ${oldBal} -> ${newBal}`, true);
+                triggerVisualAlert(symbol);
+            }
+
+            balanceMemory[symbol] = newBal;
+            updateAssetCard(symbol, newBal);
+        }
+
+        function updateAssetCard(symbol, bal) {
+            let card = document.getElementById(`card-${symbol}`);
+            if (!card) {
+                card = document.createElement('div');
+                card.id = `card-${symbol}`;
+                card.className = "bg-slate-800 p-5 rounded-xl border border-slate-700 transition-all";
+                document.getElementById('assetsGrid').appendChild(card);
+            }
+            card.innerHTML = `<span class="text-slate-500 text-xs block">${symbol} BALANCE</span>
+                             <span class="text-2xl font-bold text-green-400">${bal}</span>`;
+        }
+
+        function pushLog(asset, msg, isAlert = false) {
+            const container = document.getElementById('logContainer');
+            const entry = document.createElement('div');
+            entry.className = `log-entry p-2 rounded ${isAlert ? 'bg-red-900/20 text-red-400 border border-red-900/50' : 'text-slate-400 border-l-2 border-green-600 pl-3'}`;
+            entry.innerHTML = `[${new Date().toLocaleTimeString()}] <b>${asset}:</b> ${msg}`;
+            container.prepend(entry);
+        }
+
+        function triggerVisualAlert(symbol) {
+            const card = document.getElementById(`card-${symbol}`);
+            card.classList.add('movement-alert');
+            setTimeout(() => card.classList.remove('movement-alert'), 5000);
+        }
+    </script>
+</body>
+</html>
