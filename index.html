@@ -19,16 +19,13 @@
     <div class="max-w-5xl mx-auto">
         <header class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-800 pb-6 gap-4">
             <div>
-                <h1 class="text-3xl font-bold text-green-500">AYO RADAR <span class="text-xs bg-green-900/30 px-2 py-1 rounded">V2.1 PRO</span></h1>
+                <h1 class="text-3xl font-bold text-green-500">AYO RADAR <span class="text-xs bg-green-900/30 px-2 py-1 rounded">V2.2 PRO</span></h1>
                 <div id="totalValue" class="text-white font-mono text-lg mt-1">Total Assets: <span class="text-green-400">$0.00</span></div>
             </div>
             
             <div class="flex flex-wrap items-center justify-center gap-3">
-                <a href="https://www.linkedin.com/in/ayoup-alhaj-ali-4385b02ba" target="_blank" class="bg-[#0077b5] hover:bg-[#005c8c] text-white text-[10px] md:text-xs font-bold py-2 px-4 rounded-lg transition-all flex items-center gap-2">LINKEDIN</a>
-                <a href="https://t.me/Ayoupalhaj" target="_blank" class="bg-[#0088cc] hover:bg-[#006699] text-white text-[10px] md:text-xs font-bold py-2 px-4 rounded-lg transition-all flex items-center gap-2">TELEGRAM</a>
-                <div id="connectionStatus" class="flex items-center gap-2 text-[10px] font-mono text-slate-500 border-l border-slate-700 pl-3">
-                    <span class="w-2 h-2 bg-slate-600 rounded-full"></span> OFFLINE
-                </div>
+                <a href="https://www.linkedin.com/in/ayoup-alhaj-ali-4385b02ba" target="_blank" class="bg-[#0077b5] hover:bg-[#005c8c] text-white text-[10px] md:text-xs font-bold py-2 px-4 rounded-lg transition-all flex items-center gap-2 font-mono">LINKEDIN</a>
+                <a href="https://t.me/Ayoupalhaj" target="_blank" class="bg-[#0088cc] hover:bg-[#006699] text-white text-[10px] md:text-xs font-bold py-2 px-4 rounded-lg transition-all flex items-center gap-2 font-mono">TELEGRAM</a>
             </div>
         </header>
 
@@ -37,18 +34,18 @@
                 <input type="text" id="walletAddr" placeholder="Enter Wallet Address..." 
                     class="flex-1 bg-slate-950 border border-slate-700 p-4 rounded-xl focus:outline-none focus:border-green-500 font-mono text-sm">
                 <div class="flex gap-2">
-                    <button onclick="startMonitoring()" id="btnStart" class="bg-green-600 hover:bg-green-500 px-6 py-4 rounded-xl font-bold transition-all flex-1 text-xs">START</button>
-                    <button onclick="stopMonitoring()" id="btnStop" class="bg-red-600 hover:bg-red-500 px-6 py-4 rounded-xl font-bold transition-all hidden text-xs">STOP</button>
+                    <button onclick="startMonitoring()" id="btnStart" class="bg-green-600 hover:bg-green-500 px-8 py-4 rounded-xl font-bold transition-all flex-1 text-xs">START</button>
+                    <button onclick="stopMonitoring()" id="btnStop" class="bg-red-600 hover:bg-red-500 px-8 py-4 rounded-xl font-bold transition-all hidden text-xs">STOP</button>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="assetsGrid"></div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="assetsGrid"></div>
 
         <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
             <div class="p-4 bg-slate-800/50 border-b border-slate-800 font-bold text-slate-300">Live Movement Log</div>
             <div id="logContainer" class="max-h-[300px] overflow-y-auto p-4 space-y-2 font-mono text-xs text-slate-400">
-                <div class="italic">Ready for target input...</div>
+                <div class="italic text-center">Ready for target input...</div>
             </div>
         </div>
     </div>
@@ -58,24 +55,37 @@
         const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
         const ERC20_ABI = ["function balanceOf(address) view returns (uint256)", "function decimals() view returns (uint8)"];
         
+        // Expanded Token List
         const TOKENS = [
-            { symbol: "USDT", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7", price: 1 },
-            { symbol: "USDC", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eb48", price: 1 },
-            { symbol: "DAI", address: "0x6B175474E89094C44Da98b954EedeAC495271d0F", price: 1 },
-            { symbol: "PEPE", address: "0x6982508145454Ce325dDbE47a25d4ec3d2311933", price: 0.000008 },
-            { symbol: "SHIB", address: "0x95aD61b0a150d79219dcf64E1E6Cc01f0B64C4cE", price: 0.00002 }
+            { symbol: "USDT", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7", cgId: "tether" },
+            { symbol: "USDC", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eb48", cgId: "usd-coin" },
+            { symbol: "PEPE", address: "0x6982508145454Ce325dDbE47a25d4ec3d2311933", cgId: "pepe" },
+            { symbol: "SHIB", address: "0x95aD61b0a150d79219dcf64E1E6Cc01f0B64C4cE", cgId: "shiba-inu" },
+            { symbol: "LINK", address: "0x514910771AF9Ca656af840dff83E8264EcF986CA", cgId: "chainlink" },
+            { symbol: "UNI", address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984", cgId: "uniswap" },
+            { symbol: "WBTC", address: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", cgId: "wrapped-bitcoin" },
+            { symbol: "MATIC", address: "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0", cgId: "matic-network" }
         ];
 
         let balanceMemory = {};
         let monitorInterval = null;
-        let ethPrice = 2500; 
+        let prices = { ethereum: 0 };
+
+        async function fetchPrices() {
+            try {
+                const ids = "ethereum," + TOKENS.map(t => t.cgId).join(",");
+                const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
+                prices = await res.json();
+            } catch (e) { console.error("Price fetch failed"); }
+        }
 
         async function startMonitoring() {
             const address = document.getElementById('walletAddr').value.trim();
             if(!ethers.utils.isAddress(address)) return alert("Invalid Address!");
 
             toggleButtons(true);
-            pushLog("System", `Initializing Radar for: ${address.substring(0,10)}...`);
+            await fetchPrices();
+            pushLog("System", "Radar Online. Prices updated.");
             
             await performScan(address);
             monitorInterval = setInterval(() => performScan(address), 15000);
@@ -84,52 +94,50 @@
         function stopMonitoring() {
             clearInterval(monitorInterval);
             toggleButtons(false);
-            pushLog("System", "Monitoring Stopped.", false);
+            pushLog("System", "Monitoring Stopped.");
         }
 
         function toggleButtons(isRunning) {
             document.getElementById('btnStart').classList.toggle('hidden', isRunning);
             document.getElementById('btnStop').classList.toggle('hidden', !isRunning);
             document.getElementById('walletAddr').disabled = isRunning;
-            document.getElementById('connectionStatus').innerHTML = isRunning ? 
-                `<span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> LIVE` : 
-                `<span class="w-2 h-2 bg-slate-600 rounded-full"></span> OFFLINE`;
         }
 
         async function performScan(address) {
             let totalUSD = 0;
             try {
+                // ETH
                 const ethRaw = await provider.getBalance(address);
-                const ethBal = parseFloat(ethers.utils.formatEther(ethRaw)).toFixed(4);
-                totalUSD += ethBal * ethPrice;
-                handleBalanceUpdate("ETH", ethBal);
+                const ethBal = parseFloat(ethers.utils.formatEther(ethRaw));
+                totalUSD += ethBal * (prices.ethereum?.usd || 0);
+                handleUpdate("ETH", ethBal.toFixed(4));
 
+                // Tokens
                 for (const t of TOKENS) {
                     const contract = new ethers.Contract(t.address, ERC20_ABI, provider);
                     const balRaw = await contract.balanceOf(address);
                     const dec = await contract.decimals();
-                    const bal = (Number(balRaw) / Math.pow(10, Number(dec))).toFixed(2);
+                    const bal = Number(balRaw) / Math.pow(10, Number(dec));
                     
-                    if (parseFloat(bal) > 0) {
-                        totalUSD += bal * t.price;
-                        handleBalanceUpdate(t.symbol, bal);
+                    if (bal > 0) {
+                        totalUSD += bal * (prices[t.cgId]?.usd || 0);
+                        handleUpdate(t.symbol, bal.toFixed(2));
                     }
                 }
-                document.getElementById('totalValue').innerHTML = `Total Assets: <span class="text-green-400">$${totalUSD.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>`;
-            } catch (e) { console.error("Scan Error"); }
+                document.getElementById('totalValue').innerHTML = `Total Assets: <span class="text-green-400 font-bold">$${totalUSD.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>`;
+            } catch (e) { console.error("Scan error"); }
         }
 
-        function handleBalanceUpdate(symbol, newBal) {
-            const oldBal = balanceMemory[symbol];
-            if (oldBal !== undefined && oldBal !== newBal) {
-                pushLog(symbol, `CHANGE: ${oldBal} -> ${newBal}`, true);
-                triggerVisualAlert(symbol);
+        function handleUpdate(symbol, newBal) {
+            if (balanceMemory[symbol] && balanceMemory[symbol] !== newBal) {
+                pushLog(symbol, `Movement: ${balanceMemory[symbol]} -> ${newBal}`, true);
+                triggerAlert(symbol);
             }
             balanceMemory[symbol] = newBal;
-            updateAssetCard(symbol, newBal);
+            renderCard(symbol, newBal);
         }
 
-        function updateAssetCard(symbol, bal) {
+        function renderCard(symbol, bal) {
             let card = document.getElementById(`card-${symbol}`);
             if (!card) {
                 card = document.createElement('div');
@@ -137,19 +145,18 @@
                 card.className = "bg-slate-800 p-4 rounded-xl border border-slate-700 log-entry";
                 document.getElementById('assetsGrid').appendChild(card);
             }
-            card.innerHTML = `<span class="text-slate-500 text-[10px] block font-bold">${symbol}</span>
-                             <span class="text-xl font-bold text-green-400">${bal}</span>`;
+            card.innerHTML = `<span class="text-slate-500 text-[10px] block font-bold">${symbol}</span><span class="text-xl font-bold text-green-400">${bal}</span>`;
         }
 
-        function pushLog(asset, msg, isAlert = false) {
+        function pushLog(asset, msg, alert = false) {
             const container = document.getElementById('logContainer');
             const entry = document.createElement('div');
-            entry.className = `log-entry p-2 rounded ${isAlert ? 'bg-red-900/20 text-red-400 border border-red-900/40' : 'text-slate-400 border-l-2 border-green-600 pl-3'}`;
+            entry.className = `p-2 rounded ${alert ? 'bg-red-900/20 text-red-400 border border-red-900/40' : 'border-l-2 border-green-600 pl-3'}`;
             entry.innerHTML = `[${new Date().toLocaleTimeString()}] <b>${asset}:</b> ${msg}`;
             container.prepend(entry);
         }
 
-        function triggerVisualAlert(symbol) {
+        function triggerAlert(symbol) {
             const card = document.getElementById(`card-${symbol}`);
             if(card) {
                 card.classList.add('movement-alert');
